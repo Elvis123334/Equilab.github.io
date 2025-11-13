@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Equilab - Foro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #4a7efc;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .desc {
+            text-align: center;
+            margin: 30px 10px 15px 10px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        .user-section, .comment-section {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0px 2px 10px #bbb2;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+        button {
+            padding: 8px 14px;
+            background: #4a7efc;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .comment, .reply {
+            border-top: 1px solid #eee;
+            margin-top: 18px;
+            padding-top: 12px;
+        }
+        .comment-author, .reply-author {
+            font-weight: bold;
+            color: #4a7efc;
+        }
+        .reply-box {
+            margin-top: 7px;
+            padding-left: 18px;
+            background: #f8f8fb;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Equilab</h1>
+    </header>
+    <div class="desc">
+        Este es Equilab, un lugar donde los jóvenes pueden encontrar soluciones a cómo llevar bien el equilibrio digital a través de ellos mismos.
+    </div>
+    <div class="container">
+        <!-- Crear usuario -->
+        <div class="user-section">
+            <h2>Crear Usuario</h2>
+            <label for="username">Nombre de usuario:</label>
+            <input type="text" id="username" placeholder="Ingrese su nombre de usuario">
+            <button onclick="crearUsuario()">Crear usuario</button>
+            <div id="usuario-creado" style="margin-top:10px;color:green;"></div>
+        </div>
+
+        <!-- Comentar problemas -->
+        <div class="comment-section">
+            <h2>Comenta tu problema</h2>
+            <label for="comentario">Comentario:</label>
+            <textarea id="comentario" rows="3" placeholder="Expón aquí tu problema o situación"></textarea>
+            <button onclick="publicarComentario()">Publicar comentario</button>
+
+            <div id="comentarios"></div>
+        </div>
+    </div>
+    
+    <script>
+        let usuarioActual = '';
+        let comentarios = [];
+
+        function crearUsuario() {
+            const nombre = document.getElementById('username').value.trim();
+            if(nombre === '') {
+                alert('Por favor, escriba un nombre de usuario.');
+                return;
+            }
+            usuarioActual = nombre;
+            document.getElementById('usuario-creado').innerText = 'Usuario: ' + usuarioActual;
+        }
+
+        function publicarComentario() {
+            if(!usuarioActual) {
+                alert('Primero debe crear un usuario.');
+                return;
+            }
+            const comentario = document.getElementById('comentario').value.trim();
+            if(comentario === '') {
+                alert('El comentario no puede estar vacío.');
+                return;
+            }
+            comentarios.push({
+                autor: usuarioActual,
+                texto: comentario,
+                respuestas: []
+            });
+            document.getElementById('comentario').value = '';
+            mostrarComentarios();
+        }
+
+        function publicarRespuesta(i) {
+            if(!usuarioActual) {
+                alert('Primero debe crear un usuario.');
+                return;
+            }
+            const respuesta = document.getElementById('respuesta-'+i).value.trim();
+            if(respuesta === '') {
+                alert('La respuesta no puede estar vacía.');
+                return;
+            }
+            comentarios[i].respuestas.push({
+                autor: usuarioActual,
+                texto: respuesta
+            });
+            document.getElementById('respuesta-'+i).value = '';
+            mostrarComentarios();
+        }
+
+        function mostrarComentarios() {
+            const cont = document.getElementById('comentarios');
+            cont.innerHTML = '';
+            comentarios.forEach((c, i) => {
+                const div = document.createElement('div');
+                div.className = 'comment';
+                div.innerHTML = `<span class="comment-author">${c.autor}:</span> ${c.texto}
+                    <div>
+                        <textarea id="respuesta-${i}" rows="2" class="reply-box" placeholder="Responde al comentario"></textarea>
+                        <button onclick="publicarRespuesta(${i})">Responder</button>
+                    </div>
+                    <div>
+                        ${c.respuestas.map(r => `<div class="reply"><span class="reply-author">${r.autor}:</span> ${r.texto}</div>`).join('')}
+                    </div>`;
+                cont.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
